@@ -1,12 +1,19 @@
-type Product = {
-  id: string;
+export type TProduct = {
+  id: string | number;
   title: string;
   price: number;
   description?: string;
   category: string;
   image: string;
+  rating: {
+    rate: number;
+    count: number;
+  };
 };
 
-type Products = Product[];
+export type TProducts = TProduct[];
 
-
+export type FilterSearchparams = {
+  query: string;
+  category: string;
+};
