@@ -4,9 +4,7 @@ import { TPokemon } from '@/utils/pokemon-types';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-type Props = {
-  params: { id: string };
-};
+type Props = Promise<{ id: string }>;
 
 async function getPokemon(id: string): Promise<TPokemon | null> {
   const { success, data } = await fetchGetPokemonId(
@@ -25,10 +23,13 @@ export async function generateStaticParams() {
   return ids.map((id) => ({ id: id.toString() }));
 }
 
-export async function generateMetadata(params: Props): Promise<Metadata> {
-  const {
-    params: { id },
-  } = params;
+export async function generateMetadata({
+  params,
+}: {
+  params: Props;
+}): Promise<Metadata> {
+  const { id } = await params;
+
   const pokemon = await getPokemon(id);
 
   return {
