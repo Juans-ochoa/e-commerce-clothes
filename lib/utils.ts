@@ -1,15 +1,10 @@
+import { TResponse } from '@/utils/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-type TResponse<TData> = {
-  data?: TData;
-  error?: Error;
-  success: boolean;
-};
 
 type TFetch = <TData>(url: string) => Promise<TResponse<TData>>;
 

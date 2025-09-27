@@ -17,3 +17,9 @@ export type FilterSearchparams = {
   query: string;
   category: string;
 };
+
+export type TResponse<TData> = {
+  data?: TData;
+  error?: Error;
+  success: boolean;
+};
