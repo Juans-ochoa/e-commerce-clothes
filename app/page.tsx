@@ -2,6 +2,8 @@
 
 import FilterWithDebounce from '@/components/FilterWithDebounce';
 import injection from '@/components/HOC/injection';
+import requirement, { TRequiredProps } from '@/components/HOC/requirement';
+import withErrorBoundary from '@/components/HOC/withErrorBoundary';
 import VirtualListOne from '@/components/VirtualListOne';
 
 type ProductInfoProps = {
@@ -13,7 +15,29 @@ type ProductInfoProps = {
   title: string;
 };
 
+type TUserProps = {
+  id: string;
+  title: string;
+};
+
+const UserInfo = (data: TUserProps & TRequiredProps) => {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md mt-6 w-full max-w-2xl">
+      <h2 className="text-2xl font-bold mb-2 text-gray-800">
+        {data.id} & {data.title}
+      </h2>
+      <p className="text-gray-600 mb-4">Role: {data.userRole}</p>
+    </div>
+  );
+};
+
+const UserPermission = requirement(UserInfo);
+
 const ProductInfo = (data: ProductInfoProps) => {
+  if (data.id === '1') {
+    throw new Error(`Error procesando producto: ${data.name}`);
+  }
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mt-6 w-full max-w-2xl">
       <h2 className="text-2xl font-bold mb-2 text-gray-800">
@@ -36,12 +60,47 @@ const ProductInfo = (data: ProductInfoProps) => {
 
 const ProductInfoWithInjection = injection(ProductInfo);
 
+const ProductWithErrorBoundary = withErrorBoundary({
+  fallback: ({ error, resetError, hasRetry }) => (
+    <div className="bg-red-100 p-4 rounded-lg shadow-md mt-6 w-full max-w-2xl">
+      <h2 className="text-xl font-bold mb-2 text-red-800">Error</h2>
+      <p className="text-red-600 mb-4">{error.message}</p>
+      {hasRetry && (
+        <button
+          onClick={resetError}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Retry
+        </button>
+      )}
+    </div>
+  ),
+  onError: (error, errorInfo) => {
+    console.error('Logging error to service:', { error, errorInfo });
+  },
+  enableRetry: true,
+})(ProductInfo); // withErrorBoundary({})(ProductInfo);
+
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center p-10 bg-blue-50">
       <h1 className="text-4xl font-bold text-blue-600">Listado de productos</h1>
       <FilterWithDebounce />
-      <ProductInfoWithInjection id="1" title="Producto 1" />
+      <ProductWithErrorBoundary
+        description="This description will cause an error"
+        id="1"
+        name="Producto 1"
+        price={12.0} // 👈 Esto causará error en .toFixed(2)
+        inStock={true}
+        title="Producto 1"
+      />
+      <UserPermission
+        id="1"
+        title="This user has a permission"
+        isAuthenticated
+        userRole="admin"
+      />
+      <ProductInfoWithInjection id="2" title="Producto 1" />
       <VirtualListOne
         itemCount={10000}
         viewportHeight={800}
