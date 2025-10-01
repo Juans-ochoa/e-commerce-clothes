@@ -5,6 +5,10 @@ import injection from '@/components/HOC/injection';
 import requirement, { TRequiredProps } from '@/components/HOC/requirement';
 import withErrorBoundary from '@/components/HOC/withErrorBoundary';
 import VirtualListOne from '@/components/VirtualListOne';
+import VirtualizedProductList from '@/components/ProductListExample';
+import VirtualizedSimpleList from '@/components/SimpleVirtualizedList';
+import { generateSampleProducts } from '@/lib/sample-data';
+import { useState } from 'react';
 
 type ProductInfoProps = {
   id: string;
@@ -82,6 +86,26 @@ const ProductWithErrorBoundary = withErrorBoundary({
 })(ProductInfo); // withErrorBoundary({})(ProductInfo);
 
 export default function Home() {
+  // Generar datos de ejemplo (5000 productos)
+  const [products] = useState(() => generateSampleProducts(5000));
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+  // Generar datos simples para el segundo ejemplo
+  const [simpleItems] = useState(() =>
+    Array.from({ length: 10000 }, (_, i) => ({
+      id: i + 1,
+      text: `Este es el elemento número ${i + 1} en la lista virtualizada`,
+      color: `bg-${
+        ['blue', 'green', 'yellow', 'purple', 'pink', 'indigo'][i % 6]
+      }-100`,
+    })),
+  );
+
+  const handleProductClick = (product: any) => {
+    setSelectedProduct(product);
+    console.log('Producto seleccionado:', product);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center p-10 bg-blue-50">
       <h1 className="text-4xl font-bold text-blue-600">Listado de productos</h1>
@@ -101,12 +125,72 @@ export default function Home() {
         userRole="admin"
       />
       <ProductInfoWithInjection id="2" title="Producto 1" />
-      <VirtualListOne
-        itemCount={10000}
-        viewportHeight={800}
-        rowHeight={50}
-        nodePadding={5}
-      />
+      {/* Ejemplo Simple del HOC */}
+      <div className="w-full max-w-4xl mt-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          🎯 Ejemplo Básico HOC - {simpleItems.length.toLocaleString()}{' '}
+          Elementos
+        </h2>
+
+        <VirtualizedSimpleList items={simpleItems} />
+
+        <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            💡 <strong>Demo:</strong> {simpleItems.length.toLocaleString()}{' '}
+            elementos renderizados de forma eficiente. Solo los elementos
+            visibles están en el DOM.
+          </p>
+        </div>
+      </div>
+
+      {/* Ejemplo Complejo del HOC withVirtualization */}
+      <div className="w-full max-w-4xl mt-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          📦 Ejemplo Complejo HOC - {products.length.toLocaleString()} Productos
+        </h2>
+
+        {selectedProduct && (
+          <div className="mb-4 p-4 bg-green-100 rounded-lg">
+            <p className="text-green-800">
+              ✅ Producto seleccionado: <strong>{selectedProduct.name}</strong>{' '}
+              - ${selectedProduct.price.toFixed(2)}
+            </p>
+          </div>
+        )}
+
+        <VirtualizedProductList
+          items={products}
+          onProductClick={handleProductClick}
+        />
+
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+          <h3 className="font-semibold text-gray-700 mb-2">
+            🚀 Características del HOC:
+          </h3>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>
+              ✅ Virtualización de {products.length.toLocaleString()} elementos
+            </li>
+            <li>✅ Solo renderiza elementos visibles (~5-7 elementos)</li>
+            <li>✅ Scroll suave y performante</li>
+            <li>✅ Navegación programática (botones Inicio/Medio/Final)</li>
+            <li>✅ TypeScript type-safe</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Lista original para comparación */}
+      <div className="w-full max-w-4xl mt-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          📋 Lista Original (para comparación)
+        </h2>
+        <VirtualListOne
+          itemCount={1000}
+          viewportHeight={400}
+          rowHeight={50}
+          nodePadding={5}
+        />
+      </div>
     </main>
   );
 }
