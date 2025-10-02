@@ -1,3 +1,4 @@
+import TestWithLogger from '@/components/test-hoc/TestWithLogger';
 import TestWithToggle from '@/components/test-hoc/TestWithToggle';
 import TestWithLoading from '@/components/TestWithLoading';
 
@@ -7,6 +8,7 @@ export default function PageHoc() {
       <h1 className="text-2xl mb-4">HOC Loading Test - Fixed</h1>
       <TestWithLoading />
       <TestWithToggle />
+      <TestWithLogger />
     </main>
   );
 }
