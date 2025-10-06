@@ -1,3 +1,4 @@
+import TestWithAuth from '@/components/test-hoc/TestWithAuth';
 import TestWithLogger from '@/components/test-hoc/TestWithLogger';
 import TestWithToggle from '@/components/test-hoc/TestWithToggle';
 import TestWithLoading from '@/components/TestWithLoading';
@@ -9,6 +10,7 @@ export default function PageHoc() {
       <TestWithLoading />
       <TestWithToggle />
       <TestWithLogger />
+      <TestWithAuth />
     </main>
   );
 }
